@@ -9,7 +9,7 @@ Question1: a04.c
 	$(CC) $(CFLAGS) -o a04 a04.c $(LDFLAGS)
 
 runq1: Question1
-	./a04 sample4_in.txt 10 5 7 8
+	./a04 10 5 7 8
 
 clean:
 	rm -f $(OBJFILES) $(TARGET) *~ 
