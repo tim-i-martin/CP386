@@ -9,7 +9,7 @@
 #include <time.h>
 #include <semaphore.h>
 
-#define MAX_INPUT 256
+#define MAXIMUM_SIZE 256
 #define FILE_NAME "sample4_in.txt"
 
 int resource_amount;
@@ -54,9 +54,8 @@ int *safetyAlgorithm();
 // main program
 int main(int argc, char *argv[])
 {
-	printf("in the main\n");
 	if (argc < 2){
-		printf("Input file name missing... exiting with error code -1\n");
+		printf("No file name given... exiting \n");
 		return -1;
 	}
 
@@ -77,7 +76,7 @@ int main(int argc, char *argv[])
 
 	is_safe = 0; //start safe flag at 0
 
-	char *user_input = malloc(sizeof(char) * MAX_INPUT);
+	char *user_input = malloc(sizeof(char) * MAXIMUM_SIZE);
 	printf("Number of Customers: ", customer_amount);
 	printf("Currently Available resources: ");
 	for (int i = 0; i < resource_amount; i++){
@@ -115,7 +114,7 @@ int main(int argc, char *argv[])
 	{
 		printf("Commands are, 'RQ'request resources, 'RL' release resources, 'Status' output current info, 'Run' to calculate a safe sequence, or 'exit' to quit\n");
 		printf("Enter command: \n");
-		fgets(user_input, MAX_INPUT, stdin);
+		fgets(user_input, MAXIMUM_SIZE, stdin);
 		if (user_input[strlen(user_input) - 1] == '\n' && strlen(user_input) > 0){
 			user_input[strlen(user_input) - 1] = '\0';
 		}
