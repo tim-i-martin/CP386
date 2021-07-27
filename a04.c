@@ -110,8 +110,8 @@ int main(int argc, char *argv[])
 	// available[2] = atoi(argv[4]);
 	// available[3] = atoi(argv[5]);
 
-	// need to implement a loop to allow users to play with resources
-	while (1)
+	
+	while (1) //loop to ask for commands from user for RQ, RL, Status and Exit
 	{
 		printf("Commands are, 'RQ'request resources, 'RL' release resources, 'Status' output current info, 'Run' to calculate a safe sequence, or 'exit' to quit\n");
 		printf("Enter command: \n");
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 			user_input[strlen(user_input) - 1] = '\0';
 		}
 		
-		if (strstr(user_input, "RQ")){
+		if (strstr(user_input, "RQ")){ //RQ command
 			int amount = 0;
 			int *user_input_arr = malloc(sizeof(int) * (resource_amount +1));
 			char *token = NULL;
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
 			} else {
 				is_safe = 1;
 			}
-			} else if (strstr(user_input, "RL")){
+			} else if (strstr(user_input, "RL")){ //RL command
 				int amount = 0;
 				int *user_input_arr = malloc(sizeof(int) * (resource_amount +1));
 				char *token = NULL;
@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
 			} else {
 				is_safe = 1;
 			}
-			} else if (strstr(user_input, "Status")){
+			} else if (strstr(user_input, "Status")){ //Status command
 				printf("Currently Available resources: ");
 				for (int i = 0; i < resource_amount; i++){
 					printf("%d", available[i]);
@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
 					printf("\n");
 				}
 
-			} else if (strstr(user_input, "Run")){
+			} else if (strstr(user_input, "Run")){ //Run command
 				seq = safetyAlgorithm();
 				if (is_safe == 1){
 					for (int i = 0; i < customer_amount; i++){
@@ -367,7 +367,7 @@ int **readFile(char *fileName)
 	return max;
 }
 
-int safteyAlgorithm(){
+int safteyAlgorithm(){ //bankers algorithm for resource management
 	int *running = malloc(sizeof(int) * resource_amount);
 	int *seq = malloc(sizeof(int) * customer_amount);
 	int *done = malloc(sizeof(int) * customer_amount);
@@ -412,7 +412,7 @@ int safteyAlgorithm(){
 	return seq
 }
 
-void *runThread(void *t){
+void *runThread(void *t){ //thread used for the Run command
 	int thread_id = (int *)t;
 	printf("--> Customer/Thread: %d\n", *thread_id);
 	printf("	allocated resources: ");
