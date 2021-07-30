@@ -67,20 +67,28 @@ int main(int argc, char *argv[])
 	}
 	printf("\n");
 	
+// the code commented out below is crashing, I cannot figure out why this does not print, we clearly have an issue in how we handle our max array.
+	
+/*	
 	printf("Maximum resources from file:\n");
 	for (int i = 0; i < customer_amount; i++){
 		printf("in the max loop \n");
 		for (int j = 0; j < resource_amount; j++){
 			printf("in the inner\n");
-			printf("%d", max[i][j]);
+			
+			printf("value for i=  %d and j=%d\n",i, j);
+			printf("%d", *(max)[0]);
+
+			printf("value in row %d \n",*(max[i]+j));
+			printf("got past\n");
 			/*
 			if (j < customer_amount - 1){
 				printf(" ");
-			}*/
+			}/*
 		}
 		printf("\n");
 	}
-
+*/
 	
 	while (1) //loop to ask for commands from user for RQ, RL, Status and Exit
 	{
@@ -104,6 +112,9 @@ int main(int argc, char *argv[])
 				amount = amount + 1;
 			}
 			int customer_allocation = user_input_arr[0];
+			
+			printf("got here\n");
+			
 			if (amount == resource_amount +2 && customer_allocation < customer_amount){
 				for (int i = 0; i < resource_amount; i++){
 					allocated[customer_allocation][i] = user_input_arr[i + 1];
@@ -168,12 +179,13 @@ int main(int argc, char *argv[])
 			} else if (strstr(user_input, "Status")){ //Status command
 				printf("Currently Available resources: ");
 				for (int i = 0; i < resource_amount; i++){
-					printf("%d", available[i]);
-					if (i < resource_amount - 1){
-						printf(" ");
-					}
-					printf("\n");
+					printf("%d ", available[i]);
+					//if (i < resource_amount - 1){
+					//	printf(" ");
+					//}
+				
 				}
+					printf("\n");
 				printf("Maximum resources:\n");
 				for (int i = 0; i < customer_amount; i++){
 					for (int j = 0; j < resource_amount; j++){
@@ -304,7 +316,8 @@ void processFile(char *fileName)
 		i++;
 		command = strtok(NULL, "\r\n");
 	}
-	int **max = malloc(sizeof(int *) * customer_amount);
+	int **max = (int **)malloc(sizeof(int *) * customer_amount);
+	
 	for (int k = 0; k < customer_amount; k++)
 	{
 		int *variable = malloc(sizeof(int *) * customer_amount);
@@ -320,6 +333,19 @@ void processFile(char *fileName)
 		max[k] = variable;
 	}
 
+
+// this code is here to show we can print from max.... 
+	for (int a = 0; a < customer_amount; a++)
+	{
+		printf("value in row ");
+		for (int b = 0; b < resource_amount; b++)
+		{
+			printf(" %d ",*(max[a]+b));
+		}	
+		printf("\n");
+	}
+	
+	
 	return;
 }
 
