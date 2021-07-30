@@ -14,20 +14,19 @@
 
 int resource_amount;
 int customer_amount;
-int **max;
+int **max_array;
 int **allocated;
 int **need;
 int *seq;
 int *available;
 int is_safe;
 
-void processFile(char *file_name);
+int **processFile(char *file_name);
 void *runThread(void *t);
 int *safetyAlgorithm();
+void printMaxArray(int **max, int x, int y);
 
 // // function headers
-
-int read_file_count(char *fileName); // function to read input file and determine count
 
 
 int main(int argc, char *argv[])
@@ -43,9 +42,7 @@ int main(int argc, char *argv[])
 		available[i - 1] = atoi(argv[i]);
 	}
 
-	customer_amount = read_file_count(FILE_NAME);
-
-	processFile(FILE_NAME); //read file contents and populate data
+	max_array = processFile(FILE_NAME); //read file contents and populate data
 
 	allocated = malloc(sizeof(int *) * customer_amount);
 	need = malloc(sizeof(int *) * customer_amount);
@@ -67,28 +64,10 @@ int main(int argc, char *argv[])
 	}
 	printf("\n");
 	
-// the code commented out below is crashing, I cannot figure out why this does not print, we clearly have an issue in how we handle our max array.
 	
-/*	
 	printf("Maximum resources from file:\n");
-	for (int i = 0; i < customer_amount; i++){
-		printf("in the max loop \n");
-		for (int j = 0; j < resource_amount; j++){
-			printf("in the inner\n");
-			
-			printf("value for i=  %d and j=%d\n",i, j);
-			printf("%d", *(max)[0]);
-
-			printf("value in row %d \n",*(max[i]+j));
-			printf("got past\n");
-			/*
-			if (j < customer_amount - 1){
-				printf(" ");
-			}/*
-		}
-		printf("\n");
-	}
-*/
+	printMaxArray(max_array, customer_amount, resource_amount);
+	
 	
 	while (1) //loop to ask for commands from user for RQ, RL, Status and Exit
 	{
@@ -113,12 +92,11 @@ int main(int argc, char *argv[])
 			}
 			int customer_allocation = user_input_arr[0];
 			
-			printf("got here\n");
 			
 			if (amount == resource_amount +2 && customer_allocation < customer_amount){
 				for (int i = 0; i < resource_amount; i++){
 					allocated[customer_allocation][i] = user_input_arr[i + 1];
-					need[customer_allocation][i] = max[customer_allocation][i] - allocated[customer_allocation][i];
+					need[customer_allocation][i] = max_array[customer_allocation][i] - allocated[customer_allocation][i];
 					if (need[customer_allocation][i] < 0){
 						need[customer_allocation][i] = 0;
 					}
@@ -155,7 +133,7 @@ int main(int argc, char *argv[])
 				for (int i = 0; i < resource_amount; i++){
 					if (user_input_arr[i+1] <= allocated[customer_allocation][i]){
 						allocated[customer_allocation][i] -= user_input_arr[i+1];
-						need[customer_allocation][i] = max[customer_allocation][i] - allocated[customer_allocation][i];
+						need[customer_allocation][i] = max_array[customer_allocation][i] - allocated[customer_allocation][i];
 					} else {
 						printf("unable to release more than max allocated\n");
 						break;
@@ -187,15 +165,7 @@ int main(int argc, char *argv[])
 				}
 					printf("\n");
 				printf("Maximum resources:\n");
-				for (int i = 0; i < customer_amount; i++){
-					for (int j = 0; j < resource_amount; j++){
-						printf("%d", max[i][j]);
-						if (j < customer_amount - 1){
-							printf(" ");
-						}
-					}
-					printf("\n");
-				}
+				printMaxArray(max_array, customer_amount, resource_amount);
 				printf("Allocation resources:\n");
 				for (int i = 0; i < customer_amount; i++){
 					for (int j = 0; j < resource_amount; j++){
@@ -233,7 +203,7 @@ int main(int argc, char *argv[])
 				free(allocated);
 				free(need);
 				free(available);
-				free(allocated);
+				free(max_array);
 				free(seq);
 				return 0;
 			} else {
@@ -244,112 +214,73 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-int read_file_count(char *fileName)
+
+
+int **processFile(char *fileName)
 {
-	int count = 0;
-	char c;
-	
-	FILE *fp = fopen(fileName, "r");
-	if (!fp)
-	{
-	printf("Error in opening the input file...exit with error code -1\n");
-		return -1;
-	}
-	
-	while(!feof(fp)){
-	
-	c = fgetc(fp);
-		if (c == 'n')
-		{
-			count ++;
-		}
-	
-	}
-	
-	fclose(fp);
-	return count;
-}
+	FILE *file_input = fopen(fileName, "r");
 
-
-void processFile(char *fileName)
-{
-	FILE *in = fopen(fileName, "r");
-
-	/*removed this as we process the file already so we know it works
-	if (!in)
+	if (!file_input)
 	{
 		printf("Error in opening the input file...exit with error code -1\n");
 		return -1;
 	}
-	*/
+
 	struct stat st;
-	fstat(fileno(in), &st);
+	fstat(fileno(file_input), &st);
 	char *content_of_file = (char *)malloc(((int)st.st_size + 1) * sizeof(char));
 	content_of_file[0] = '\0';
-	while (!feof(in))
+	while (!feof(file_input))
 	{
 		char line[100];
-		if (fgets(line, 100, in) != NULL)
+		if (fgets(line, 100, file_input) != NULL)
 		{
 			strncat(content_of_file, line, strlen(line));
 		}
 	}
-	fclose(in);
+	fclose(file_input);
 	char *command = NULL;
 	char *copy_file = (char *)malloc((strlen(content_of_file) + 1) * sizeof(char));
 	strcpy(copy_file, content_of_file);
 	command = strtok(copy_file, "\r\n");
 	while (command != NULL)
 	{
-		customer_amount++;
+		customer_amount = customer_amount +1;
 		command = strtok(NULL, "\r\n");
 	}
 
 	strcpy(copy_file, content_of_file);
 	char *lines[customer_amount];
 	int i = 0;
-	command = strtok(content_of_file, "\r\n");
+	command = strtok(copy_file, "\r\n");
 	while (command != NULL)
 	{
 		lines[i] = malloc(sizeof(command) * sizeof(char));
 		strcpy(lines[i], command);
-		i++;
+		i = 1 +1;
 		command = strtok(NULL, "\r\n");
 	}
-	int **max = (int **)malloc(sizeof(int *) * customer_amount);
+	int **maximum = malloc(sizeof(int *) * customer_amount);
 	
 	for (int k = 0; k < customer_amount; k++)
 	{
-		int *variable = malloc(sizeof(int *) * customer_amount);
+		int *variable = malloc(sizeof(int) * resource_amount);
 		char *token = NULL;
 		int j = 0;
 		token = strtok(lines[k], ",");
 		while (token != NULL)
 		{
 			variable[j] = atoi(token);
-			j++;
+			j=j+1;
 			token = strtok(NULL, ",");
 		}
-		max[k] = variable;
+		maximum[k] = variable;
 	}
-
-
-// this code is here to show we can print from max.... 
-	for (int a = 0; a < customer_amount; a++)
-	{
-		printf("value in row ");
-		for (int b = 0; b < resource_amount; b++)
-		{
-			printf(" %d ",*(max[a]+b));
-		}	
-		printf("\n");
-	}
-	
-	
-	return;
+		
+	return maximum;
 }
 
-int* safetyAlgorithm(){ //bankers algorithm for resource management
+int *safetyAlgorithm(){ //bankers algorithm for resource management
 	int *running = malloc(sizeof(int) * resource_amount);
 	int *seq = malloc(sizeof(int) * customer_amount);
 	int *done = malloc(sizeof(int) * customer_amount);
@@ -361,7 +292,7 @@ int* safetyAlgorithm(){ //bankers algorithm for resource management
 	while (amount < customer_amount){
 		int safe_flag = 0;
 		for (int i =0; i < customer_amount; i++){
-			if (done[0] == 0){
+			if (done[i] == 0){
 				int safe_int = 1;
 				for (int j = 0; j < resource_amount; j++){
 					if (need[i][j] > running[j]){
@@ -397,17 +328,17 @@ int* safetyAlgorithm(){ //bankers algorithm for resource management
 void *runThread(void *t){ //thread used for the Run command
 	int *thread_id = (int *)t;
 	printf("--> Customer/Thread: %d\n", *thread_id);
-	printf("	allocated resources: ");
+	printf("    allocated resources: ");
 	for (int i =0;i< resource_amount; i++){
 		printf("	%d", allocated[*thread_id][i]);
 	}
 	printf("\n");
-	printf("	Needed: ");
+	printf("    Needed: ");
 	for (int i =0;i< resource_amount; i++){
 		printf("	%d", need[*thread_id][i]);
 	}
 	printf("\n");
-	printf("	Available: ");
+	printf("    Available: ");
 	for (int i =0;i< resource_amount; i++){
 		printf("	%d", available[i]);
 	}
@@ -426,5 +357,17 @@ void *runThread(void *t){ //thread used for the Run command
 	printf("\n");
 	pthread_exit(NULL);
 }
+
+void printMaxArray(int **max, int x, int y){
+for (int i = 0; i < x; i++){
+		for (int j = 0; j < y; j++){
+			printf("%d", max[i][j]);
+			if (j < y - 1){
+				printf(" ");
+			}
+		}
+		printf("\n");
+	}
+	}
 
 
