@@ -29,6 +29,7 @@ void printMaxArray(int **max, int x, int y);
 // // function headers
 
 
+
 int main(int argc, char *argv[])
 {
 	if (argc < 2){
@@ -223,7 +224,7 @@ int **processFile(char *fileName)
 	if (!file_input)
 	{
 		printf("Error in opening the input file...exit with error code -1\n");
-		return -1;
+		return NULL;
 	}
 
 	struct stat st;
@@ -245,7 +246,7 @@ int **processFile(char *fileName)
 	command = strtok(copy_file, "\r\n");
 	while (command != NULL)
 	{
-		customer_amount = customer_amount +1;
+		customer_amount = customer_amount + 1;
 		command = strtok(NULL, "\r\n");
 	}
 
@@ -257,7 +258,7 @@ int **processFile(char *fileName)
 	{
 		lines[i] = malloc(sizeof(command) * sizeof(char));
 		strcpy(lines[i], command);
-		i = 1 +1;
+		i = i + 1;
 		command = strtok(NULL, "\r\n");
 	}
 	int **maximum = malloc(sizeof(int *) * customer_amount);
@@ -359,7 +360,7 @@ void *runThread(void *t){ //thread used for the Run command
 }
 
 void printMaxArray(int **max, int x, int y){
-for (int i = 0; i < x; i++){
+	for (int i = 0; i < x; i++){
 		for (int j = 0; j < y; j++){
 			printf("%d", max[i][j]);
 			if (j < y - 1){
