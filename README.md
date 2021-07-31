@@ -10,6 +10,11 @@ you can clean the file by doing
 make clean
 
 Screenshots -> 
+![image](https://user-images.githubusercontent.com/72165624/127727861-42a34341-5aa3-486f-bd69-e63077033d8a.png)
+![image](https://user-images.githubusercontent.com/72165624/127727889-8d64ac67-66e0-4d80-888a-61c83d175f2f.png)
+![image](https://user-images.githubusercontent.com/72165624/127727899-aa0b93fe-afdc-4c99-8158-c06d3d8fb453.png)
+![image](https://user-images.githubusercontent.com/72165624/127727902-a968cdc2-609a-4c72-878c-5dac73283e1a.png)
+
 
 Individual Contributions -> Main(Matt/Tim)
                             Processfile(Matt/Tim)
