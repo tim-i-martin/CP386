@@ -258,7 +258,7 @@ int main(int argc, char *argv[])
 				free(seq);
 				return 0;
 			} else {
-				printf("Command not valid please enter \"RQ\", \"RL\", \"*\" or \"Exit\"\n");
+				printf("Command not valid please enter \"RQ\", \"RL\", \"Status\" or \"Exit\"\n");
 			}
 
 		}

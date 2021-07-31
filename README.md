@@ -23,7 +23,7 @@ Print the current state (Status)
 Run safe sequence (Run)
 Exit program (exit)
 
-Tests ->
+Tests -> Shown in Screenshots
 
 Use examples -> Shown in screenshots
 
