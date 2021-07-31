@@ -10,10 +10,11 @@ you can clean the file by doing
 make clean
 
 Screenshots -> 
-![image](https://user-images.githubusercontent.com/72165624/127727861-42a34341-5aa3-486f-bd69-e63077033d8a.png)
-![image](https://user-images.githubusercontent.com/72165624/127727889-8d64ac67-66e0-4d80-888a-61c83d175f2f.png)
-![image](https://user-images.githubusercontent.com/72165624/127727899-aa0b93fe-afdc-4c99-8158-c06d3d8fb453.png)
-![image](https://user-images.githubusercontent.com/72165624/127727902-a968cdc2-609a-4c72-878c-5dac73283e1a.png)
+![image](https://user-images.githubusercontent.com/72165624/127748270-60e0ca52-9de3-4302-be05-c61a33cb8e10.png)
+![image](https://user-images.githubusercontent.com/72165624/127748282-7d2345a1-6e73-4720-b068-831d2be4e88c.png)
+![image](https://user-images.githubusercontent.com/72165624/127748289-aa9ae7d5-d4cc-41ec-b540-f18988181c10.png)
+![image](https://user-images.githubusercontent.com/72165624/127748304-25e397a1-7f3a-4786-a536-849c8a7c275b.png)
+![image](https://user-images.githubusercontent.com/72165624/127748314-b72a4847-252c-4044-860f-d554ccecd50d.png)
 
 
 Individual Contributions -> Main(Matt/Tim)
