@@ -24,6 +24,7 @@ int is_safe;
 int **processFile(char *file_name);
 void *runThread(void *t);
 int *safetyAlgorithm();
+int runFunction();
 void printMaxArray(int **max, int x, int y);
 
 // // function headers
@@ -81,7 +82,7 @@ int main(int argc, char *argv[])
 	
 	while (1) //loop to ask for commands from user for RQ, RL, Status and Exit
 	{
-		printf("Commands are, 'RQ'request resources, 'RL' release resources, '*' output current info, 'Run' to calculate a safe sequence, or 'exit' to quit\n");
+		printf("Commands are, 'RQ'request resources, 'RL' release resources, 'Status' output current info, 'Run' to calculate a safe sequence, or 'exit' to quit\n");
 		printf("Enter command: \n");
 		fgets(user_input, MAXIMUM_SIZE, stdin);
 		if (user_input[strlen(user_input) - 1] == '\n' && strlen(user_input) > 0){
@@ -264,7 +265,7 @@ int main(int argc, char *argv[])
 			
 			
 			} 
-			else if (strstr(user_input, "*"))//Status command
+			else if (strstr(user_input, "Status"))//Status command
 			{ 
 				printf("Currently Available resources: ");
 				for (int i = 0; i < resource_amount; i++){
@@ -299,17 +300,8 @@ int main(int argc, char *argv[])
 				}
 
 			} else if (strstr(user_input, "Run")){ //Run command
-				seq = safetyAlgorithm();
-				if (is_safe == 1){
-					for (int i = 0; i < customer_amount; i++){
-						int new_thread = seq[i];
-						pthread_t thread_id;
-						pthread_attr_t attribute_thread;
-						pthread_attr_init(&attribute_thread);
-						pthread_create(&thread_id, &attribute_thread, runThread, (void *)&new_thread);
-						pthread_join(thread_id, NULL);
-					}
-				}
+				runFunction();
+
 			} else if (strstr(user_input, "exit")){
 				free(allocated);
 				free(need);
@@ -441,17 +433,17 @@ void *runThread(void *t){ //thread used for the Run command
 	printf("--> Customer/Thread: %d\n", *thread_id);
 	printf("    allocated resources: ");
 	for (int i =0;i< resource_amount; i++){
-		printf("	%d", allocated[*thread_id][i]);
+		printf(" %d", allocated[*thread_id][i]);
 	}
 	printf("\n");
 	printf("    Needed: ");
 	for (int i =0;i< resource_amount; i++){
-		printf("	%d", need[*thread_id][i]);
+		printf(" %d", need[*thread_id][i]);
 	}
 	printf("\n");
 	printf("    Available: ");
 	for (int i =0;i< resource_amount; i++){
-		printf("	%d", available[i]);
+		printf(" %d", available[i]);
 	}
 	printf("\n");
 	printf("    Thread has started\n");
@@ -480,5 +472,57 @@ void printMaxArray(int **max, int x, int y){
 		printf("\n");
 	}
 	}
+	
+int runFunction(){
+	int f[customer_amount];
+	int sequence[customer_amount];
+	int index = 0;
+	for (int k = 0; k < customer_amount; k ++){
+		f[k] = 0;
+	}
+	int needed[customer_amount][resource_amount];
+	for (int i = 0; i < customer_amount; i++ ){
+		for (int j = 0; j < resource_amount; j++){
+			needed[i][j] = max_array[i][j] - allocated[i][j];
+		}
+		int x = 0;
+		for (int k = 0; k < 5; k++){
+		for (int i=0; i <customer_amount; i++){
+			if (f[i] ==0){
+				int safe_flag = 0;
+				for (int j = 0; j < resource_amount; j++){
+					if (needed[i][j] > available[j]){
+						safe_flag = 1;
+						break;
+					}
+				}
+				if (safe_flag == 0){
+					sequence[index] = i;
+					index = index +1;
+					for (x = 0; x < resource_amount; x++){
+						available[x] += allocated[i][x];
+						
+					}
+					f[i] = 1;
+				}
+			}
+		}
+	}
+	}
+	printf("Safe Sequence is: ");
+	for (int i =0; i <customer_amount-1; i++){
+		printf("%d", sequence[i]);
+	}
+	printf("%d", sequence[customer_amount-1]);
+	for (int i = 0; i < customer_amount; i++){
+						int new_thread = sequence[i];
+						pthread_t thread_id;
+						pthread_attr_t attribute_thread;
+						pthread_attr_init(&attribute_thread);
+						pthread_create(&thread_id, &attribute_thread, runThread, (void *)&new_thread);
+						pthread_join(thread_id, NULL);
+						}
+	return 0;
+}
 
 
