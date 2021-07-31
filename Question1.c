@@ -142,36 +142,29 @@ int main(int argc, char *argv[])
 				
 					seq = safetyAlgorithm();
 				
-					//printf("\nSafety Result %d\n", seq[0]);
-				
-					if (seq[0] == -1)
-					{
-						for (int i = 1; i < resource_amount+1; i++)
-						{
-							available[i-1] = available[i-1] + user_input_arr[i];
-							allocated[customer_allocation][i-1] = allocated[customer_allocation][i-1] - user_input_arr[i];
-							need[customer_allocation][i-1] = max_array[customer_allocation][i-1]-allocated[customer_allocation][i-1];
+					if (seq[0] != -1){
+						for (int i = 1; i < resource_amount+1; i++){
+						available[i-1] = available[i-1] + user_input_arr[i];
+						allocated[customer_allocation][i-1] = allocated[customer_allocation][i-1] - user_input_arr[i];
+						need[customer_allocation][i-1] = max_array[customer_allocation][i-1]-allocated[customer_allocation][i-1];
+										
 						}
-						
-						printf("request rejected, leaves in unsafe state\n\n");	
+						printf("request rejected, leaves in unsafe state\n\n");		
 					}
 					else{
 						printf("State is safe, request granted\n");
-					}	
-				}
-					
-					
+					}
 					free(user_input_arr);
 				}	
+			}	
 			
-			
-				else {
-					if (customer_allocation >= customer_amount){
-						printf("Thread not available please do another \n");
-					} else {
-						printf("not enough parameters. try again \n");
-					}
-				}		
+			else {
+				if (customer_allocation >= customer_amount){
+					printf("Thread not available please do another \n");
+				} else {
+					printf("not enough parameters. try again \n");
+				}
+			}		
 			} 
 			
 			else if (strstr(user_input, "RL"))//RL command
@@ -339,88 +332,10 @@ int **processFile(char *fileName)
 }
 
 int *safetyAlgorithm(){ //bankers algorithm for resource management
-//	int *running = malloc(sizeof(int) * resource_amount);
+	int *running = malloc(sizeof(int) * resource_amount);
 	int *seq = malloc(sizeof(int) * customer_amount);
-//	int *done = malloc(sizeof(int) * customer_amount);
+	int *done = malloc(sizeof(int) * customer_amount);
 
-	int *work = malloc(sizeof(int) * resource_amount);
-	int *finish = malloc(sizeof(int) * customer_amount);
-
-
-	// populate the work and finish vectors
-	for (int i = 0; i < resource_amount; i++)
-	{
-		work[i] = available[i];
-	}
-	
-	// establish 0 as our false flag
-	for (int i = 0; i < customer_amount; i++)
-	{
-		finish[i] = 0;
-	}
-	
-// step 2 of algorithm, need to loop as many times as customers as we could always find the last index
-	
-	int iteration = 0;
-	
-	while(iteration < customer_amount){
-	
-	for (int i = 0; i < customer_amount; i++)
-	{
-/* print testing to see how this is working
-		printf("work is: ");
-		for (int a = 0; a < resource_amount; a++)
-		{
-			printf(" %d",work[a]);
-		}
-		printf("\n");
-*/		
-		int valid = 1; 
-		int sequence = 0; // track current index of sequence
-		
-		if (finish[i] == 0)
-		{
-			for(int j = 0; j < resource_amount; j++)
-			{
-				if(need[i][j] > work[j])
-				{
-					valid = 0; // found an instance where need exceeds available
-				}
-			
-			}
-			
-			if (valid == 1)	// found a valid thread
-			{
-				//printf("processed thread %d as valid\n", i);
-				
-				seq[sequence] = i;
-				sequence++;
-				finish[i] = 1; // set flag to true 
-				
-				for (int k = 0; k < resource_amount; k++)
-				{
-					work[k] = work[k] + allocated[i][k];
-				}
-			}
-		}
-	}
-	iteration++;
-	}
-	for (int i = 0; i < customer_amount; i++)
-	{
-
-		//printf("\ncurrent customer is %d and status is %d\n",i, finish[i]);
-	
-		if (finish[i] != 1)
-		{
-			seq[0] = -1;	// return a value that shows a failure
-		}
-	
-	}
-	
-	
-
-/*
 	for (int i = 0; i <resource_amount; i++){
 		running[i] = available[i];
 	}
@@ -456,11 +371,8 @@ int *safetyAlgorithm(){ //bankers algorithm for resource management
 		return seq;
 	}
 	}
-
-	
 	free(running);
 	free(done);
-*/
 	return seq;
 }
 
