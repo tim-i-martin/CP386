@@ -52,6 +52,15 @@ int main(int argc, char *argv[])
 		need[i] = malloc(sizeof(int) * resource_amount);
 	}
 
+	for (int i = 0; i < customer_amount; i++)
+	{
+		for (int j= 0; j < resource_amount; j ++)
+		{
+			need[i][j] = max_array[i][j] - allocated[i][j];
+		}
+	}
+
+
 	is_safe = 0; //start safe flag at 0
 
 	char *user_input = malloc(sizeof(char) * MAXIMUM_SIZE);
@@ -72,7 +81,7 @@ int main(int argc, char *argv[])
 	
 	while (1) //loop to ask for commands from user for RQ, RL, Status and Exit
 	{
-		printf("Commands are, 'RQ'request resources, 'RL' release resources, 'Status' output current info, 'Run' to calculate a safe sequence, or 'exit' to quit\n");
+		printf("Commands are, 'RQ'request resources, 'RL' release resources, '*' output current info, 'Run' to calculate a safe sequence, or 'exit' to quit\n");
 		printf("Enter command: \n");
 		fgets(user_input, MAXIMUM_SIZE, stdin);
 		if (user_input[strlen(user_input) - 1] == '\n' && strlen(user_input) > 0){
@@ -95,6 +104,65 @@ int main(int argc, char *argv[])
 			
 			
 			if (amount == resource_amount +2 && customer_allocation < customer_amount){
+				int valid = 1;
+				
+// need a better way to handle these loops
+
+				// step 1, verify if request not greater than need
+				for (int i = 1; i < resource_amount; i++){
+					if (user_input_arr[i]>need[customer_allocation][i]) {
+						printf("requested too many resources (exceeded need) \n");
+						valid = 0; // reset flag
+						break;
+					}
+				}
+				// step 2, verify if the request <= available to proceed				
+				if (valid == 1){						
+					for (int i = 1; i < resource_amount; i++){
+						if (user_input_arr[i] > available[i-1]) {
+							printf("requested resources are not available \n");
+							break;	
+						}
+						
+					}
+				}
+				// step 3, pretend to allocate				
+				if (valid == 1)
+				{
+					for (int i = 1; i < resource_amount+1; i++){
+						available[i-1] = available[i-1] - user_input_arr[i];
+						allocated[customer_allocation][i-1] = allocated[customer_allocation][i-1] + user_input_arr[i];
+						need[customer_allocation][i-1] = max_array[customer_allocation][i-1]-allocated[customer_allocation][i-1];
+										
+					}
+				
+					seq = safetyAlgorithm();
+				
+					if (seq[0] != -1){
+						for (int i = 1; i < resource_amount+1; i++){
+						available[i-1] = available[i-1] + user_input_arr[i];
+						allocated[customer_allocation][i-1] = allocated[customer_allocation][i-1] - user_input_arr[i];
+						need[customer_allocation][i-1] = max_array[customer_allocation][i-1]-allocated[customer_allocation][i-1];
+										
+						}
+						printf("request rejected, leaves in unsafe state\n\n");		
+					}
+					else{
+						printf("State is safe, request granted\n");
+					}
+					free(user_input_arr);
+				}	
+			}	
+			
+			else {
+				if (customer_allocation >= customer_amount){
+					printf("Thread not available please do another \n");
+				} else {
+					printf("not enough parameters. try again \n");
+				}
+			}		
+			/*
+			if (amount == resource_amount +2 && customer_allocation < customer_amount){
 				for (int i = 0; i < resource_amount; i++){
 					allocated[customer_allocation][i] = user_input_arr[i + 1];
 					need[customer_allocation][i] = max_array[customer_allocation][i] - allocated[customer_allocation][i];
@@ -109,6 +177,7 @@ int main(int argc, char *argv[])
 					printf("not enough parameters. try again \n");
 				}
 				}
+			
 			free(user_input_arr);
 			seq = safetyAlgorithm();
 			printf("State is safe, request granted\n");
@@ -117,29 +186,62 @@ int main(int argc, char *argv[])
 			} else {
 				is_safe = 1;
 			}
-			} else if (strstr(user_input, "RL")){ //RL command
+			*/
+			
+// end of requesting resources			
+			} 
+			
+			else if (strstr(user_input, "RL"))//RL command
+			{ 
 				int amount = 0;
+				
 				int *user_input_arr = malloc(sizeof(int) * (resource_amount +1));
 				char *token = NULL;
 				token = strtok(user_input, " ");
 				while (token != NULL){
-				if (amount > 0){
-					user_input_arr[amount - 1] = atoi(token);
+					
+					if (amount > 0){
+						user_input_arr[amount - 1] = atoi(token);
+					}
+					token = strtok(NULL, " ");
+					amount = amount + 1;
 				}
-				token = strtok(NULL, " ");
-				amount = amount + 1;
-			}
-			int customer_allocation = user_input[0];
-			if (amount == resource_amount +2 && customer_allocation < customer_amount){
+		
+			int customer_allocation = user_input_arr[0];
+			
+			//printf("amount %d resources %d customer %d cust_amt %d\n",amount, resource_amount, customer_allocation, customer_amount);
+			
+			if (amount == resource_amount +2 && customer_allocation <= customer_amount){
+				int valid = 1; // set valid flag to 1
 				for (int i = 0; i < resource_amount; i++){
+					if(user_input_arr[i+1] > allocated[customer_allocation][i]){
+						valid = 0;
+					}
+				}
+				if (valid == 0){
+					printf("unable to release more than max allocated\n");
+				}
+				else{
+					for (int i = 0; i < resource_amount; i++){
+						available[i] = available[i] + user_input_arr[i+1];
+						allocated[customer_allocation][i] = allocated[customer_allocation][i] - user_input_arr[i+1];
+						need[customer_allocation][i] = max_array[customer_allocation][i]-allocated[customer_allocation][i];
+					
+					}
+				}
+				
+/*				
 					if (user_input_arr[i+1] <= allocated[customer_allocation][i]){
 						allocated[customer_allocation][i] -= user_input_arr[i+1];
 						need[customer_allocation][i] = max_array[customer_allocation][i] - allocated[customer_allocation][i];
 					} else {
-						printf("unable to release more than max allocated\n");
+						
 						break;
+
 					}
-				}				
+*/
+								
+
 			} else {
 				if (customer_allocation >= customer_amount){
 					printf("Thread not available please do another \n");
@@ -148,14 +250,22 @@ int main(int argc, char *argv[])
 				}
 			}
 			free(user_input_arr);
+
+/*  don't need this piece as if we are releasing, we just have to make sure we have enough to release, there must be a safe sequence in place so no need to check
 			seq = safetyAlgorithm();
+
 			printf("State is safe, request granted\n");
 			if (seq[0] == -1){
 				is_safe = 0;
 			} else {
 				is_safe = 1;
 			}
-			} else if (strstr(user_input, "Status")){ //Status command
+*/			
+			
+			
+			} 
+			else if (strstr(user_input, "*"))//Status command
+			{ 
 				printf("Currently Available resources: ");
 				for (int i = 0; i < resource_amount; i++){
 					printf("%d ", available[i]);
@@ -208,7 +318,7 @@ int main(int argc, char *argv[])
 				free(seq);
 				return 0;
 			} else {
-				printf("Command not valid please enter \"RQ\", \"RL\", \"Status\" or \"Exit\"\n");
+				printf("Command not valid please enter \"RQ\", \"RL\", \"*\" or \"Exit\"\n");
 			}
 
 		}
@@ -353,7 +463,7 @@ void *runThread(void *t){ //thread used for the Run command
     printf("    New Available: ");
 	for (int i =0 ; i<resource_amount;  i++){
 		available[i] += allocated[*thread_id][i];
-		printf("%d", available[i]);
+		printf(" %d", available[i]);
 	}
 	printf("\n");
 	pthread_exit(NULL);
