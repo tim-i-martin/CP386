@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 
 				// step 1, verify if request not greater than need
 				for (int i = 1; i < resource_amount; i++){
-					if (user_input_arr[i]>need[customer_allocation][i]) {
+					if (user_input_arr[i]>need[customer_allocation][i-1]) {
 						printf("requested too many resources (exceeded need) \n");
 						valid = 0; // reset flag
 						break;
