@@ -1,4 +1,9 @@
-/* Tim Martin and Matt Paek*/
+/*  Tim Martin 98113500
+	Matt Paek 140810440
+	tim-i-martin
+	MattPaek
+	GitHub: https://github.com/tim-i-martin/CP386
+*/
 
 #include <unistd.h>
 #include <stdio.h>
@@ -106,8 +111,6 @@ int main(int argc, char *argv[])
 			
 			if (amount == resource_amount +2 && customer_allocation < customer_amount){
 				int valid = 1;
-				
-// need a better way to handle these loops
 
 				// step 1, verify if request not greater than need
 				for (int i = 1; i < resource_amount; i++){
@@ -162,34 +165,6 @@ int main(int argc, char *argv[])
 					printf("not enough parameters. try again \n");
 				}
 			}		
-			/*
-			if (amount == resource_amount +2 && customer_allocation < customer_amount){
-				for (int i = 0; i < resource_amount; i++){
-					allocated[customer_allocation][i] = user_input_arr[i + 1];
-					need[customer_allocation][i] = max_array[customer_allocation][i] - allocated[customer_allocation][i];
-					if (need[customer_allocation][i] < 0){
-						need[customer_allocation][i] = 0;
-					}
-				}
-			} else {
-				if (customer_allocation >= customer_amount){
-					printf("Thread not available please do another \n");
-				} else {
-					printf("not enough parameters. try again \n");
-				}
-				}
-			
-			free(user_input_arr);
-			seq = safetyAlgorithm();
-			printf("State is safe, request granted\n");
-			if (seq[0] == -1){
-				is_safe = 0;
-			} else {
-				is_safe = 1;
-			}
-			*/
-			
-// end of requesting resources			
 			} 
 			
 			else if (strstr(user_input, "RL"))//RL command
@@ -210,7 +185,7 @@ int main(int argc, char *argv[])
 		
 			int customer_allocation = user_input_arr[0];
 			
-			//printf("amount %d resources %d customer %d cust_amt %d\n",amount, resource_amount, customer_allocation, customer_amount);
+			
 			
 			if (amount == resource_amount +2 && customer_allocation <= customer_amount){
 				int valid = 1; // set valid flag to 1
@@ -230,19 +205,7 @@ int main(int argc, char *argv[])
 					
 					}
 				}
-				
-/*				
-					if (user_input_arr[i+1] <= allocated[customer_allocation][i]){
-						allocated[customer_allocation][i] -= user_input_arr[i+1];
-						need[customer_allocation][i] = max_array[customer_allocation][i] - allocated[customer_allocation][i];
-					} else {
-						
-						break;
-
-					}
-*/
-								
-
+							
 			} else {
 				if (customer_allocation >= customer_amount){
 					printf("Thread not available please do another \n");
@@ -251,28 +214,13 @@ int main(int argc, char *argv[])
 				}
 			}
 			free(user_input_arr);
-
-/*  don't need this piece as if we are releasing, we just have to make sure we have enough to release, there must be a safe sequence in place so no need to check
-			seq = safetyAlgorithm();
-
-			printf("State is safe, request granted\n");
-			if (seq[0] == -1){
-				is_safe = 0;
-			} else {
-				is_safe = 1;
-			}
-*/			
-			
-			
+				
 			} 
 			else if (strstr(user_input, "Status"))//Status command
 			{ 
 				printf("Currently Available resources: ");
 				for (int i = 0; i < resource_amount; i++){
 					printf("%d ", available[i]);
-					//if (i < resource_amount - 1){
-					//	printf(" ");
-					//}
 				
 				}
 					printf("\n");
@@ -481,17 +429,22 @@ int runFunction(){
 		f[k] = 0;
 	}
 	int needed[customer_amount][resource_amount];
+	int copy[resource_amount];
+	for (int i=0; i < resource_amount; i++){
+		copy[i] = available[i];
+		}
 	for (int i = 0; i < customer_amount; i++ ){
 		for (int j = 0; j < resource_amount; j++){
 			needed[i][j] = max_array[i][j] - allocated[i][j];
 		}
+		}
 		int x = 0;
-		for (int k = 0; k < 5; k++){
+		for (int k = 0; k < 13; k++){
 		for (int i=0; i <customer_amount; i++){
 			if (f[i] ==0){
 				int safe_flag = 0;
 				for (int j = 0; j < resource_amount; j++){
-					if (needed[i][j] > available[j]){
+					if (needed[i][j] > copy[j]){
 						safe_flag = 1;
 						break;
 					}
@@ -500,7 +453,7 @@ int runFunction(){
 					sequence[index] = i;
 					index = index +1;
 					for (x = 0; x < resource_amount; x++){
-						available[x] += allocated[i][x];
+						copy[x] += allocated[i][x];
 						
 					}
 					f[i] = 1;
@@ -508,12 +461,12 @@ int runFunction(){
 			}
 		}
 	}
-	}
+
 	printf("Safe Sequence is: ");
 	for (int i =0; i <customer_amount-1; i++){
 		printf("%d", sequence[i]);
 	}
-	printf("%d", sequence[customer_amount-1]);
+	printf("%d\n", sequence[customer_amount-1]);
 	for (int i = 0; i < customer_amount; i++){
 						int new_thread = sequence[i];
 						pthread_t thread_id;
